@@ -14,9 +14,21 @@ class Name(Field):
 
 
 class Phone(Field):
-    def validation_phone(phone: str) -> bool:
-        return len(phone) == 10 and phone.isdigit()     
+    def __init__(self, value: str):
+        self.__value = None
+        self.value = value
 
+    @property
+    def value(self):
+        return self.__value
+    
+    @value.setter
+    def value(self, value: str):
+        if type(value) is str and len(value) == 10 and value.isdigit():
+            self.__value = value
+        else:
+            raise ValueError("You entered an incorrect phone number!")
+    
 
 class Record:
     def __init__(self, name: str):
@@ -24,7 +36,6 @@ class Record:
         self.phones = []
 
     def add_phone(self, phone: str):
-        if Phone.validation_phone(phone):
             self.phones.append(Phone(phone))
 
     def remove_phone(self, phone: str):
@@ -32,10 +43,10 @@ class Record:
 
     def edit_phone(self, old_phone: str, new_phone: str):
         user_phone = self.find_phone(old_phone)
-        if isinstance(user_phone, Phone) and Phone.validation_phone(new_phone):
+        if isinstance(user_phone, Phone):
             user_phone.value = new_phone
         else:
-            raise ValueError("You entered incorrect data!")
+            raise ValueError("You entered an incorrect phone number!")
 
     def find_phone(self, phone: str) -> Phone:
         return next((ph for ph in self.phones if ph.value == phone), None)
